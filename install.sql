@@ -10,8 +10,6 @@ DROP SCHEMA IF EXISTS
 	[Pacify];
 GO
 
--- this is the URL where we will try to fetch the latest Bootstrap procedure from
-
 
 -- create a schema to contain all Pacify resources
 CREATE SCHEMA
@@ -33,7 +31,15 @@ EXEC sp_configure
 RECONFIGURE;
 GO
 
--- issue a GET request to fetch the Pacify.Bootstrap procedure from Git
+/*
+ * issue a GET request to fetch the Pacify.Bootstrap procedure from Git
+ */
+-- OPTIONAL: this is an HTTP proxy to use (NULL if none to use)
+DECLARE @httpProxy NVARCHAR(200) = NULL;
+
+-- this is the URL where we will try to fetch the latest Bootstrap procedure from
+DECLARE @bootstrapUri NVARCHAR(200) = 'https://raw.githubusercontent.com/the-code-dimension/pacify/main/bootstrap.sql';
+
 -- first, create a new object to make the request
 DECLARE @requestObjectType NVARCHAR(200) = 'MSXML2.ServerXMLHttp';
 DECLARE @obj INT;
@@ -61,6 +67,62 @@ IF @hresult != 0 BEGIN
 		1;
 END;
 
--- finally, destroy the object
+-- set up a proxy if the user provided one
+IF @httpProxy IS NOT NULL BEGIN
+	
+END;
+
+-- initiate a new GET request to the Bootstrap URI and ensure the call was successful
+EXEC @hresult = sp_OAMethod
+	@obj,
+	'open',
+	NULL,
+	'GET',
+	@bootstrapUri,
+	false;
+
+IF @hresult != 0 BEGIN
+	SET @errorMessage = CONCAT(
+		'Failed calling method ''open'' of ',
+		@requestObjectType,
+		' (error code ',
+		@hresult,
+		')'
+	);
+
+	EXEC sp_OADestroy
+		@obj;
+
+	THROW
+		50002,
+		@errorMessage,
+		1;
+END;
+
+-- send the GET request and ensure that the call was successful
+EXEC @hresult = sp_OAMethod
+	@obj,
+	'send',
+	NULL,
+	'';
+IF @hresult != 0 BEGIN
+	SET @errorMessage = CONCAT(
+		'Failed calling method ''send'' of ',
+		@requestObjectType,
+		' (error code ',
+		@hresult,
+		')'
+	);
+
+	EXEC sp_OADestroy
+		@obj;
+
+	THROW
+		50003,
+		@errorMessage,
+		1;
+END;
+
+-- destroy the request object as we have the resultant file
 EXEC sp_OADestroy
 	@obj;
