@@ -12,6 +12,10 @@ PRINT '';
 DROP PROCEDURE IF EXISTS
 	Pacify.LogOperation;
 DECLARE @createQuery NVARCHAR(MAX) = '
+------------------------------------------------------------
+-- NOTE: this procedure was automatically created by
+-- Pacify.Bootstrap
+------------------------------------------------------------
 CREATE PROCEDURE Pacify.LogOperation
 	@logMessage NVARCHAR(2000),
 	@logDepth	INT
@@ -35,6 +39,10 @@ EXEC Pacify.LogOperation
 DROP PROCEDURE IF EXISTS
 	Pacify.MakeHttpRequest;
 SET @createQuery = '
+------------------------------------------------------------
+-- NOTE: this procedure was automatically created by
+-- Pacify.Bootstrap
+------------------------------------------------------------
 CREATE PROCEDURE Pacify.MakeHttpRequest
 	@method		NVARCHAR(20),
 	@targetUri	NVARCHAR(2000),
