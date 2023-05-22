@@ -1,7 +1,9 @@
 /*
  *
  */
-CREATE PROCEDURE Pacify.Bootstrap AS BEGIN
+CREATE PROCEDURE Pacify.Bootstrap
+	@targetBranch NVARCHAR(4000)
+AS BEGIN
 -- output an initial header
 DECLARE @hrule NVARCHAR(120) = REPLICATE('-', 120);
 PRINT @hrule;
