@@ -121,7 +121,12 @@ PRINT @hrule;
 DECLARE @httpProxy NVARCHAR(200) = NULL;
 
 -- this is the URL where we will try to fetch the latest Bootstrap procedure from
-DECLARE @bootstrapUri NVARCHAR(200) = 'https://raw.githubusercontent.com/the-code-dimension/pacify/main/procedures/bootstrap.sql';
+DECLARE @targetBranch NVARCHAR(200) = 'main';
+DECLARE @bootstrapUri NVARCHAR(200) = CONCAT(
+	'https://raw.githubusercontent.com/the-code-dimension/pacify/',
+	@targetBranch,
+	'/procedures/bootstrap.sql'
+);
 
 -- first, create a new object to make the request
 DECLARE @requestObjectType NVARCHAR(200) = 'MSXML2.ServerXMLHttp';
@@ -293,4 +298,5 @@ IF (
 END;
 
 -- finally, execute the Bootstrap procedure
-EXEC Pacify.Bootstrap;
+EXEC Pacify.Bootstrap
+    @targetBranch;

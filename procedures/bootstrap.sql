@@ -8,6 +8,11 @@ AS BEGIN
 DECLARE @hrule NVARCHAR(120) = REPLICATE('-', 120);
 PRINT @hrule;
 PRINT 'Pacify Bootstrap Procedure';
+PRINT CONCAT(
+    'Installing from target branch ''',
+    @targetBranch,
+    ''''
+);
 PRINT '';
 
 -- set up a procedure to output log information
