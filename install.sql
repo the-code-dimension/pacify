@@ -1,5 +1,20 @@
 
 /*
+ * Authors: Will
+ * Created: 2023-05-22
+ * Updated: 2023-05-22
+ *
+ * This is the installation query for the Pacify package manager for SQL Server.
+ * It performs initial configuration and fetches the latest version of
+ * Pacify.Bootstrap from Github which sets up all other necessary components.
+ *
+ * Notes:
+ *	- To reinstall, uncomment the first block below and run this entire script.
+ *	- Set the @httpProxy variable if your network requires a proxy in order to
+ *	  issue requests to Github
+ */
+
+/*
  * Uncomment the following block if you are reinstalling Pacify and would like to
  * remove the existing installation.
  *
