@@ -231,11 +231,18 @@ IF @hresult != 0 BEGIN
 END;
 
 -- get the results from the HTTP request and ensure that the call was successful
-DECLARE @results NVARCHAR(4000);
-EXEC @hresult = sp_OAMethod
+DECLARE @results NVARCHAR(MAX);
+DROP TABLE IF EXISTS
+	#tblResults;
+CREATE TABLE #tblResults (
+	[ResultField] NVARCHAR(MAX)
+);
+INSERT #tblResults (
+	[ResultField]
+)
+EXEC @hresult = sp_OAGetProperty
     @obj,
-    'responseText',
-    @results OUTPUT;
+    'responseText';
 IF @hresult != 0 BEGIN
     SET @errorMessage = CONCAT(
         'Failed calling method ''responseText'' of ',
@@ -253,6 +260,10 @@ IF @hresult != 0 BEGIN
         @errorMessage,
         1;
 END;
+SELECT
+	@results = [ResultField]
+FROM
+	#tblResults;
 PRINT @results;
 
 -- destroy the request object as we have the resultant Bootstrap procedure
