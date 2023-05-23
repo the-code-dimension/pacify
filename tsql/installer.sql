@@ -97,6 +97,18 @@ CREATE SCHEMA
     [Pacify];
 GO
 
+-- create a new user to execute installations
+DROP USER IF EXISTS
+	[PacifyUser];
+
+CREATE USER
+	[PacifyUser]
+WITHOUT
+	LOGIN
+WITH
+	DEFAULT_SCHEMA=[Pacify];
+GO
+
 /*
  * ensure that Advanced Options and OLE Automation Procedures are enabled
  * so that we can issue HTTP requests
