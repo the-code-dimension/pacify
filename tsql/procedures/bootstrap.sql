@@ -13,7 +13,7 @@ AS BEGIN
  * impersonate the PacifyUser which the installer should have created. this
  * will ensure that the PacifyUser account owns all the related resources
  */
-EXECUTE AS LOGIN = 'PacifyUser';
+EXECUTE AS USER = 'PacifyUser';
 
 -- output an initial header
 DECLARE @hrule NVARCHAR(120) = REPLICATE('-', 120);
