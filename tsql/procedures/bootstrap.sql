@@ -7,7 +7,8 @@
  * the initial installer query and creates initial required procedures.
  */
 CREATE PROCEDURE Pacify.Bootstrap
-	@targetBranch NVARCHAR(4000)
+	@repo			NVARCHAR(4000),
+	@targetBranch	NVARCHAR(4000)
 AS BEGIN
 /*
  * impersonate the PacifyUser which the installer should have created. this
@@ -22,7 +23,8 @@ PRINT 'Pacify Bootstrap Procedure';
 PRINT CONCAT(
     'Installing from target branch ''',
     @targetBranch,
-    ''''
+    ''' of repo ',
+	@repo
 );
 PRINT '';
 

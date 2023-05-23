@@ -153,8 +153,11 @@ DECLARE @httpProxy NVARCHAR(200) = NULL;
 -- this is the URL where we will try to fetch the latest Bootstrap procedure from
 DECLARE @targetBranch NVARCHAR(200) = 'main';
 DECLARE @dialect NVARCHAR(200) = 'tsql';
+DECLARE @repo NVARCHAR(200) = 'the-code-dimension/pacify';
 DECLARE @bootstrapUri NVARCHAR(200) = CONCAT(
-	'https://raw.githubusercontent.com/the-code-dimension/pacify/',
+	'https://raw.githubusercontent.com/',
+	@repo,
+	'/',
 	@targetBranch,
 	'/',
 	@dialect,
@@ -332,4 +335,5 @@ END;
 
 -- finally, execute the Bootstrap procedure
 EXEC Pacify.Bootstrap
+	@repo,
     @targetBranch;
