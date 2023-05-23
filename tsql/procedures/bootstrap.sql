@@ -1,5 +1,10 @@
 /*
+ * Authors: Will
+ * Created: 2023-05-22
+ * Updated: 2023-05-22
  *
+ * This is the Pacify bootstrap procedure. It is downloaded and executed by
+ * the initial installer query and creates initial required procedures.
  */
 CREATE PROCEDURE Pacify.Bootstrap
 	@targetBranch NVARCHAR(4000)
