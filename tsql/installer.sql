@@ -97,7 +97,10 @@ CREATE SCHEMA
     [Pacify];
 GO
 
--- create a new user to execute installations
+/*
+ * create a new user to execute Pacify tasks. grant impersonation permissions
+ * to the user executing this query
+ */
 DROP USER IF EXISTS
 	[PacifyUser];
 
@@ -107,6 +110,21 @@ WITHOUT
 	LOGIN
 WITH
 	DEFAULT_SCHEMA=[Pacify];
+
+GRANT ALTER ON
+	SCHEMA::[Pacify]
+TO
+	[PacifyUser];
+
+GRANT CREATE PROCEDURE TO
+	[PacifyUser];
+
+DECLARE @grantQuery NVARCHAR(MAX) = CONCAT(
+	'GRANT IMPERSONATE ON USER::PacifyUser TO [', SYSTEM_USER, '];'
+);
+PRINT @grantQuery;
+EXEC sp_executesql
+	@grantQuery;
 GO
 
 /*
