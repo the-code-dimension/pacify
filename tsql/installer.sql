@@ -37,7 +37,7 @@ WITH cteObjectTypes AS (
         'PROCEDURE' AS [Name]
     UNION
     SELECT
-        'T',
+        'U',
         'TABLE'
     UNION
     SELECT
@@ -63,7 +63,8 @@ LEFT JOIN sys.schemas AS b ON
 LEFT JOIN cteObjectTypes AS c ON
     a.[type] = c.[Type]
 WHERE
-    b.[name] = 'Pacify';
+	a.[type] NOT IN ('PK')
+    AND b.[name] = 'Pacify';
 
 -- loop over all of the derived DROP queries
 DECLARE @index INT = 1;
@@ -117,6 +118,10 @@ TO
 	[PacifyUser];
 
 GRANT CREATE PROCEDURE TO
+	[PacifyUser];
+GRANT CREATE TABLE TO
+	[PacifyUser];
+GRANT EXECUTE TO
 	[PacifyUser];
 
 DECLARE @grantQuery NVARCHAR(MAX) = CONCAT(
@@ -336,4 +341,5 @@ END;
 -- finally, execute the Bootstrap procedure
 EXEC Pacify.Bootstrap
 	@repo,
-    @targetBranch;
+    @targetBranch,
+	@httpProxy;

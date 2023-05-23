@@ -8,7 +8,9 @@
  */
 CREATE PROCEDURE Pacify.Bootstrap
 	@repo			NVARCHAR(4000),
-	@targetBranch	NVARCHAR(4000)
+	@targetBranch	NVARCHAR(4000),
+	@httpProxy		NVARCHAR(4000),
+	@uriPrefix		NVARCHAR(4000) = 'https://raw.githubusercontent.com/'
 AS BEGIN
 /*
  * impersonate the PacifyUser which the installer should have created. this
@@ -223,6 +225,61 @@ EXEC sp_executesql
 EXEC Pacify.LogOperation
 	'Created procedure Pacify.MakeHttpRequest',
 	1;
+
+-- create a table to contain registered repos to update from
+DROP TABLE IF EXISTS
+	Pacify.Repos;
+CREATE TABLE Pacify.Repos (
+	[RepoID]		INT PRIMARY KEY IDENTITY(1, 1),
+	[RepoName]		NVARCHAR(4000) NOT NULL,
+	[RepoBranch]	NVARCHAR(4000) NOT NULL,
+	[RepoPrefix]	NVARCHAR(4000) NOT NULL
+);
+
+-- register the default repository
+SET NOCOUNT ON;
+INSERT INTO Pacify.Repos (
+	[RepoName],
+	[RepoBranch],
+	[RepoPrefix]
+)
+VALUES (
+	@repo,
+	@targetBranch,
+	@uriPrefix
+);
+DECLARE @logMessage NVARCHAR(MAX) = CONCAT(
+	'Inserted record for source repo ',
+	@repo
+);
+EXEC Pacify.LogOperation
+	@logMessage,
+	1;
+
+-- get and create the Pacify.Update procedure
+EXEC Pacify.LogOperation
+	'Creating procedure Pacify.Update',
+	1;
+DECLARE @targetUri NVARCHAR(MAX) = CONCAT(
+	@uriPrefix,
+	@repo,
+	'/',
+	@targetBranch,
+	'/procedures/update.sql'
+);
+DECLARE @results NVARCHAR(MAX);
+EXEC Pacify.MakeHttpRequest
+	'GET',
+	@targetUri,
+	@httpProxy,
+	@results OUT;
+SET @logMessage = CONCAT(
+	'Fetched source from ',
+	@targetUri
+);
+EXEC Pacify.LogOperation
+	@logMessage,
+	2;
 
 -- output a final horizontal rule
 PRINT @hrule;
