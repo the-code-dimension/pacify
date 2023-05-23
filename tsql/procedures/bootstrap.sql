@@ -7,10 +7,10 @@
  * the initial installer query and creates initial required procedures.
  */
 CREATE PROCEDURE Pacify.Bootstrap
-	@repo			NVARCHAR(4000),
-	@targetBranch	NVARCHAR(4000),
-	@httpProxy		NVARCHAR(4000),
-	@uriPrefix		NVARCHAR(4000) = 'https://raw.githubusercontent.com/'
+    @repo			NVARCHAR(4000),
+    @targetBranch	NVARCHAR(4000),
+    @httpProxy		NVARCHAR(4000),
+    @uriPrefix		NVARCHAR(4000) = 'https://raw.githubusercontent.com/'
 AS BEGIN
 /*
  * impersonate the PacifyUser which the installer should have created. this
@@ -26,50 +26,50 @@ PRINT CONCAT(
     'Installing from target branch ''',
     @targetBranch,
     ''' of repo ',
-	@repo
+    @repo
 );
 PRINT '';
 
 -- set up a procedure to output log information
 DROP PROCEDURE IF EXISTS
-	Pacify.LogOperation;
+    Pacify.LogOperation;
 DECLARE @createQuery NVARCHAR(MAX) = '
 ------------------------------------------------------------
 -- NOTE: this procedure was automatically created by
 -- Pacify.Bootstrap
 ------------------------------------------------------------
 CREATE PROCEDURE Pacify.LogOperation
-	@logMessage NVARCHAR(2000),
-	@logDepth	INT
+    @logMessage NVARCHAR(2000),
+    @logDepth	INT
 AS BEGIN
 DECLARE @logOutput NVARCHAR(4000) = CONCAT(
-	REPLICATE(''    '', @logDepth),
-	''- '',
-	@logMessage
+    REPLICATE(''    '', @logDepth),
+    ''- '',
+    @logMessage
 );
 PRINT @logOutput;
 END
 ';
 EXEC sp_executesql
-	@createQuery;
+    @createQuery;
 
 EXEC Pacify.LogOperation
-	'Created procedure Pacify.LogOperation',
-	1;
+    'Created procedure Pacify.LogOperation',
+    1;
 
 -- set up a procedure to make an http request
 DROP PROCEDURE IF EXISTS
-	Pacify.MakeHttpRequest;
+    Pacify.MakeHttpRequest;
 SET @createQuery = '
 ------------------------------------------------------------
 -- NOTE: this procedure was automatically created by
 -- Pacify.Bootstrap
 ------------------------------------------------------------
 CREATE PROCEDURE Pacify.MakeHttpRequest
-	@method		NVARCHAR(20),
-	@targetUri	NVARCHAR(2000),
-	@proxyUri	NVARCHAR(2000),
-	@results	NVARCHAR(MAX) OUTPUT
+    @method		NVARCHAR(20),
+    @targetUri	NVARCHAR(2000),
+    @proxyUri	NVARCHAR(2000),
+    @results	NVARCHAR(MAX) OUTPUT
 AS BEGIN
 -- first, create a new object to make the request
 DECLARE @requestObjectType NVARCHAR(200) = ''MSXML2.ServerXMLHttp'';
@@ -180,12 +180,12 @@ END;
 
 -- get the results from the HTTP request and ensure that the call was successful
 DROP TABLE IF EXISTS
-	#tblResults;
+    #tblResults;
 CREATE TABLE #tblResults (
-	[ResultField] NVARCHAR(MAX)
+    [ResultField] NVARCHAR(MAX)
 );
 INSERT #tblResults (
-	[ResultField]
+    [ResultField]
 )
 EXEC @hresult = sp_OAGetProperty
     @obj,
@@ -214,72 +214,72 @@ EXEC sp_OADestroy
 
 -- get the resulting output
 SELECT
-	@results = [ResultField]
+    @results = [ResultField]
 FROM
-	#tblResults;
+    #tblResults;
 
 END
 ';
 EXEC sp_executesql
-	@createQuery;
+    @createQuery;
 EXEC Pacify.LogOperation
-	'Created procedure Pacify.MakeHttpRequest',
-	1;
+    'Created procedure Pacify.MakeHttpRequest',
+    1;
 
 -- create a table to contain registered repos to update from
 DROP TABLE IF EXISTS
-	Pacify.Repos;
+    Pacify.Repos;
 CREATE TABLE Pacify.Repos (
-	[RepoID]		INT PRIMARY KEY IDENTITY(1, 1),
-	[RepoName]		NVARCHAR(4000) NOT NULL,
-	[RepoBranch]	NVARCHAR(4000) NOT NULL,
-	[RepoPrefix]	NVARCHAR(4000) NOT NULL
+    [RepoID]		INT PRIMARY KEY IDENTITY(1, 1),
+    [RepoName]		NVARCHAR(4000) NOT NULL,
+    [RepoBranch]	NVARCHAR(4000) NOT NULL,
+    [RepoPrefix]	NVARCHAR(4000) NOT NULL
 );
 
 -- register the default repository
 SET NOCOUNT ON;
 INSERT INTO Pacify.Repos (
-	[RepoName],
-	[RepoBranch],
-	[RepoPrefix]
+    [RepoName],
+    [RepoBranch],
+    [RepoPrefix]
 )
 VALUES (
-	@repo,
-	@targetBranch,
-	@uriPrefix
+    @repo,
+    @targetBranch,
+    @uriPrefix
 );
 DECLARE @logMessage NVARCHAR(MAX) = CONCAT(
-	'Inserted record for source repo ',
-	@repo
+    'Inserted record for source repo ',
+    @repo
 );
 EXEC Pacify.LogOperation
-	@logMessage,
-	1;
+    @logMessage,
+    1;
 
 -- get and create the Pacify.Update procedure
 EXEC Pacify.LogOperation
-	'Creating procedure Pacify.Update',
-	1;
+    'Creating procedure Pacify.Update',
+    1;
 DECLARE @targetUri NVARCHAR(MAX) = CONCAT(
-	@uriPrefix,
-	@repo,
-	'/',
-	@targetBranch,
-	'/procedures/update.sql'
+    @uriPrefix,
+    @repo,
+    '/',
+    @targetBranch,
+    '/procedures/update.sql'
 );
 DECLARE @results NVARCHAR(MAX);
 EXEC Pacify.MakeHttpRequest
-	'GET',
-	@targetUri,
-	@httpProxy,
-	@results OUT;
+    'GET',
+    @targetUri,
+    @httpProxy,
+    @results OUT;
 SET @logMessage = CONCAT(
-	'Fetched source from ',
-	@targetUri
+    'Fetched source from ',
+    @targetUri
 );
 EXEC Pacify.LogOperation
-	@logMessage,
-	2;
+    @logMessage,
+    2;
 
 -- output a final horizontal rule
 PRINT @hrule;

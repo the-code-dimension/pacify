@@ -63,7 +63,7 @@ LEFT JOIN sys.schemas AS b ON
 LEFT JOIN cteObjectTypes AS c ON
     a.[type] = c.[Type]
 WHERE
-	a.[type] NOT IN ('PK')
+    a.[type] NOT IN ('PK')
     AND b.[name] = 'Pacify';
 
 -- loop over all of the derived DROP queries
@@ -103,33 +103,33 @@ GO
  * to the user executing this query
  */
 DROP USER IF EXISTS
-	[PacifyUser];
+    [PacifyUser];
 
 CREATE USER
-	[PacifyUser]
+    [PacifyUser]
 WITHOUT
-	LOGIN
+    LOGIN
 WITH
-	DEFAULT_SCHEMA=[Pacify];
+    DEFAULT_SCHEMA=[Pacify];
 
 GRANT ALTER ON
-	SCHEMA::[Pacify]
+    SCHEMA::[Pacify]
 TO
-	[PacifyUser];
+    [PacifyUser];
 
 GRANT CREATE PROCEDURE TO
-	[PacifyUser];
+    [PacifyUser];
 GRANT CREATE TABLE TO
-	[PacifyUser];
+    [PacifyUser];
 GRANT EXECUTE TO
-	[PacifyUser];
+    [PacifyUser];
 
 DECLARE @grantQuery NVARCHAR(MAX) = CONCAT(
-	'GRANT IMPERSONATE ON USER::PacifyUser TO [', SYSTEM_USER, '];'
+    'GRANT IMPERSONATE ON USER::PacifyUser TO [', SYSTEM_USER, '];'
 );
 PRINT @grantQuery;
 EXEC sp_executesql
-	@grantQuery;
+    @grantQuery;
 GO
 
 /*
@@ -160,13 +160,13 @@ DECLARE @targetBranch NVARCHAR(200) = 'main';
 DECLARE @dialect NVARCHAR(200) = 'tsql';
 DECLARE @repo NVARCHAR(200) = 'the-code-dimension/pacify';
 DECLARE @bootstrapUri NVARCHAR(200) = CONCAT(
-	'https://raw.githubusercontent.com/',
-	@repo,
-	'/',
-	@targetBranch,
-	'/',
-	@dialect,
-	'/procedures/bootstrap.sql'
+    'https://raw.githubusercontent.com/',
+    @repo,
+    '/',
+    @targetBranch,
+    '/',
+    @dialect,
+    '/procedures/bootstrap.sql'
 );
 
 -- first, create a new object to make the request
@@ -279,12 +279,12 @@ END;
 -- get the results from the HTTP request and ensure that the call was successful
 DECLARE @results NVARCHAR(MAX);
 DROP TABLE IF EXISTS
-	#tblResults;
+    #tblResults;
 CREATE TABLE #tblResults (
-	[ResultField] NVARCHAR(MAX)
+    [ResultField] NVARCHAR(MAX)
 );
 INSERT #tblResults (
-	[ResultField]
+    [ResultField]
 )
 EXEC @hresult = sp_OAGetProperty
     @obj,
@@ -307,9 +307,9 @@ IF @hresult != 0 BEGIN
         1;
 END;
 SELECT
-	@results = [ResultField]
+    @results = [ResultField]
 FROM
-	#tblResults;
+    #tblResults;
 PRINT @results;
 
 -- destroy the request object as we have the resultant Bootstrap procedure
@@ -340,6 +340,6 @@ END;
 
 -- finally, execute the Bootstrap procedure
 EXEC Pacify.Bootstrap
-	@repo,
+    @repo,
     @targetBranch,
-	@httpProxy;
+    @httpProxy;
