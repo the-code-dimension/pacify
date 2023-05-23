@@ -9,6 +9,12 @@
 CREATE PROCEDURE Pacify.Bootstrap
 	@targetBranch NVARCHAR(4000)
 AS BEGIN
+/*
+ * impersonate the PacifyUser which the installer should have created. this
+ * will ensure that the PacifyUser account owns all the related resources
+ */
+EXECUTE AS LOGIN = 'PacifyUser';
+
 -- output an initial header
 DECLARE @hrule NVARCHAR(120) = REPLICATE('-', 120);
 PRINT @hrule;
@@ -218,5 +224,8 @@ EXEC Pacify.LogOperation
 
 -- output a final horizontal rule
 PRINT @hrule;
+
+-- stop impersonating the PacifyUser
+REVERT;
 
 END
